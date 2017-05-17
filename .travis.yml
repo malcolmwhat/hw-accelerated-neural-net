@@ -19,9 +19,6 @@ branches:
   only:
   - master
 
-before_install:
-    - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 50
-
 install:
     # Checking versions
     - g++ --version
