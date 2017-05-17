@@ -17,7 +17,7 @@
 /*
  * Model for the FPGA.
  */
-struct hardware_model
+typedef struct hardware_model
 {
 	// The register addresses for the start of the various buffers.
 	// TODO: These need to be floating point numbers.
@@ -42,12 +42,12 @@ struct hardware_model
 	uint32_t m; // Number of multipliers on chip.
 	uint32_t m_o; // Number of dot product operators on chip.
 	uint32_t m_i; // Number of multipliers per dot product operator.
-};
+} hardware_model;
 
 /*
  * Model for the control_signals of the compute unit.
  */
-struct control_signal
+typedef struct control_signal
 {
 	// Relative address of the input and output for this compute cycle.
 	uint32_t i_0;
@@ -56,11 +56,10 @@ struct control_signal
 	uint32_t m_i;
 	uint32_t m_o;
 	uint8_t activation;
-};
+} control_signal;
 
-struct hardware_model * hw;
-
-struct control_signal * ctrl_sig;
+extern hardware_model hw;
+extern control_signal ctrl_sig;
 
 /**
  * This function emulates the behaviour of the on chip controller.

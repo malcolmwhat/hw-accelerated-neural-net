@@ -32,10 +32,10 @@ struct LayerFC
 	uint32_t input_size;
 	uint32_t output_size; // Size of the weight matrix is inferred.
 
-	int32_t * inputs;
-	int32_t * outputs;
-	int32_t * weights;
-	int32_t * biases;
+	float * inputs;
+	float * outputs;
+	float * weights;
+	float * biases;
 };
 
 /*
