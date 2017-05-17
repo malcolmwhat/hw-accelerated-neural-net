@@ -32,7 +32,8 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 	/*
 	 * The first loop moves across the output neurons.
 	 */
-	for (uint32_t ot = 0; ot < layer_spec->output_size; ot += hw->output_buffer_size)
+    uint32_t ot;
+	for (ot = 0; ot < layer_spec->output_size; ot += hw->output_buffer_size)
 	{
 		// Cover edge case of partially overlapping the buffer.
 		// It's possible we have less data than can fill the output buffer.
@@ -42,7 +43,8 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 		hw->tile_height_reg = MIN(o_buff_size, required_o_buff_space);
 
 		// Place the biases for the current outputs in the output buffers.
-		for (uint32_t i = 0; i < hw->tile_height_reg; i++)
+        uint32_t i;
+		for (i = 0; i < hw->tile_height_reg; i++)
 		{
 			hw->output_buffer[i] = layer_spec->biases[ot + i]; // Eventually this will be placed in the FPGA buffer.
 		}
@@ -50,7 +52,8 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 		/*
 		 * The second loop moves across the inputs neurons.
 		 */
-		for (uint32_t it = 0; it < layer_spec->input_size; it += hw->input_buffer_size)
+        uint32_t it;
+		for (it = 0; it < layer_spec->input_size; it += hw->input_buffer_size)
 		{
 			// Again, cover edge cases for tiling.
 			uint32_t i_buff_size = hw->input_buffer_size;
@@ -69,7 +72,8 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 			}
 
 			// Place the inputs in the input buffer.
-			for (uint32_t j = 0; j < hw->tile_width_reg; j++)
+            uint32_t j;
+			for (j = 0; j < hw->tile_width_reg; j++)
 			{
 				hw->input_buffer[j] = layer_spec->inputs[it + j];
 			}
@@ -79,9 +83,11 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 			uint32_t weights_temp_origin = ot * layer_spec->input_size + it;
 
 			// Iterate over the weights and place them in the buffer in row major order.
-			for (uint32_t k = 0; k < hw->tile_height_reg; k++)
+            uint32_t k;
+			for (k = 0; k < hw->tile_height_reg; k++)
 			{
-				for (uint32_t m = 0; m < hw->tile_width_reg; m++)
+                uint32_t m;
+				for (m = 0; m < hw->tile_width_reg; m++)
 				{
 					hw->weight_buffer[k * hw->tile_width_reg + m] = layer_spec->weights[weights_temp_origin
 					        + k * layer_spec->input_size + m];
