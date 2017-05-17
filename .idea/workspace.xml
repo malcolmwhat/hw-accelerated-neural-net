@@ -11,9 +11,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ab9b86c8-4c1f-4c8b-91fa-8384f7e2b86a" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.travis.yml" afterPath="$PROJECT_DIR$/.travis.yml" />
-    </list>
+    <list default="true" id="ab9b86c8-4c1f-4c8b-91fa-8384f7e2b86a" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -407,12 +405,12 @@
       <option name="presentableId" value="Default" />
       <updated>1494980838851</updated>
       <workItem from="1494980841086" duration="2471000" />
-      <workItem from="1494983336618" duration="434000" />
+      <workItem from="1494983336618" duration="451000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2905000" />
+    <option name="totallyTimeSpent" value="2922000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
