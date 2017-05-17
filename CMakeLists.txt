@@ -6,3 +6,4 @@ set(CMAKE_CXX_STANDARD 11)
 set(SOURCE_FILES library.cpp library.h feed_forward_translation.c
         feed_forward_translation.h hardware_emulator.c hardware_emulator.h layer.h utilities.h)
 add_library(hardware_accelerator SHARED ${SOURCE_FILES})
+add_executable(runTests test.c ${SOURCE_FILES} test.h)
