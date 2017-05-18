@@ -42,28 +42,27 @@ void test_feed_forward()
     // Initialize the hardware model.
     initialize_hardware_model();
 
-    // Generate layer specification.
-    struct LayerParameters params;
-    params.layer_type = FF_FC_LAYER;
     int input_size = 5;
     int output_size = 5;
-    params.fc_structure->input_size = input_size;
-    params.fc_structure->output_size = output_size;
 
     float inputs[5] = {0.1, 0.2, 0.1, 0.5, 0.9};
-    params.fc_structure->inputs = inputs;
+
     float biases[5] = {0.5, 0.3, -0.1, -0.4, -0.1};
-    params.fc_structure->biases = biases;
+
     float weights[25] = {0.0, 0.1, 0.1, 0.5, -0.3,
-                       0.9, -0.1, -0.1, -0.6, 0.8,
-                       0.0, 0.1, 0.1, 0.0, 0.1,
-                       0.9, -0.1, -0.1, -0.6, -0.2,
-                       0.9, -0.1, -0.1, -0.6, 0.8};
-    params.fc_structure->weights = weights;
+                         0.9, -0.1, -0.1, -0.6, 0.8,
+                         0.0, 0.1, 0.1, 0.0, 0.1,
+                         0.9, -0.1, -0.1, -0.6, -0.2,
+                         0.9, -0.1, -0.1, -0.6, 0.8};
 
     float * outputs;
     outputs = (float *) malloc(output_size);
-    params.fc_structure->outputs = outputs;
+
+    // Generate layer specification.
+    LayerFC fcLayer = (LayerFC) {.input_size = input_size, .output_size = output_size,
+    .inputs = inputs, .biases = biases, .weights = weights, .outputs = outputs};
+
+    LayerParameters params = {.layer_type = FF_FC_LAYER, .fc_structure = &fcLayer};
 
     feed_forward(&params);
 
