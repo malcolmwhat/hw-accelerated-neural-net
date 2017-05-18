@@ -28,7 +28,7 @@ void begin_hardware_acceleration()
 			ctrl_sig.m_i = MIN(hw.m_i, hw.tile_width_reg - ib);
 
 			// Handle the end of line application of the activation function.
-			if (ib + hw.m_i > hw.tile_width_reg && hw.apply_activation_flag == HW_MODEL_APPLY_ACTIVATION)
+			if (ib + hw.m_i >= hw.tile_width_reg && hw.apply_activation_flag == HW_MODEL_APPLY_ACTIVATION)
 			{
 				ctrl_sig.activation = HW_MODEL_APPLY_ACTIVATION;
 			}
