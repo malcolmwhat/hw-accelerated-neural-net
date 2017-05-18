@@ -70,7 +70,8 @@ void test_feed_forward()
     float expected[] = {0.51, 0.78, 0.02, 0.0, 0.38};
     int i;
     for (i = 0; i < output_size; i++){
-        (expected[i] == params.fc_structure->outputs[i]) ? success_count++ : error_count++;
+        // Since there are precision issues with the numbers being used, there is a very slight deviation.
+        (expected[i] - params.fc_structure->outputs[i] < 0.00001) ? success_count++ : error_count++;
     }
 
     // Teardown the hardware model.
