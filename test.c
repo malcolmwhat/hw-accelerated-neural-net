@@ -50,11 +50,11 @@ void test_feed_forward()
     params.fc_structure->input_size = input_size;
     params.fc_structure->output_size = output_size;
 
-    float inputs[] = {0.1, 0.2, 0.1, 0.5, 0.9};
+    float inputs[5] = {0.1, 0.2, 0.1, 0.5, 0.9};
     params.fc_structure->inputs = inputs;
-    float biases[] = {0.5, 0.3, -0.1, -0.4, -0.1};
+    float biases[5] = {0.5, 0.3, -0.1, -0.4, -0.1};
     params.fc_structure->biases = biases;
-    float weights[] = {0.0, 0.1, 0.1, 0.5, -0.3,
+    float weights[25] = {0.0, 0.1, 0.1, 0.5, -0.3,
                        0.9, -0.1, -0.1, -0.6, 0.8,
                        0.0, 0.1, 0.1, 0.0, 0.1,
                        0.9, -0.1, -0.1, -0.6, -0.2,

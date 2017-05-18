@@ -39,7 +39,9 @@ void begin_hardware_acceleration()
 
 			ctrl_sig.i_0 = ib;
 
+			// TODO: It looks like the input offsets are not correct. Fix that.
 			compute_step();
+
 		}
 	}
 }
@@ -52,6 +54,7 @@ void compute_step()
         uint32_t i;
 		for (i = 0; i < ctrl_sig.m_i; i++)
 		{
+			// TODO: Debug this.
 			hw.output_buffer[o + ctrl_sig.o_0] = hw.input_buffer[i + ctrl_sig.i_0]
 			        * hw.weight_buffer[(ctrl_sig.o_0 + o) * hw.tile_width_reg + ctrl_sig.i_0 + i];
 			if (i + 1 == ctrl_sig.m_i && ctrl_sig.activation == HW_MODEL_APPLY_ACTIVATION)
