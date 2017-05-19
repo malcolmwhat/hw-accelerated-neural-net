@@ -20,15 +20,19 @@
 typedef struct hardware_model
 {
 	// The register addresses for the start of the various buffers.
-	// TODO: These need to be floating point numbers.
 	float * input_buffer;
 	float * weight_buffer;
 	float * output_buffer;
 
-	// All sizes are in bytes.
-	uint32_t input_buffer_size;
-	uint32_t weight_buffer_size;
-	uint32_t output_buffer_size;
+	// All sizes are in the number of input elements we can place.
+	uint32_t fc_input_buffer_size;
+	uint32_t fc_weight_buffer_size;
+	uint32_t fc_output_buffer_size;
+
+	// All sizes are in the number of input elements we can place.
+	uint32_t conv_t_ofm_z;
+	uint32_t conv_t_ofm_y;
+	uint32_t conv_t_ofm_x;
 
 	// Registers to set the tile heights.
 	uint32_t tile_height_reg;

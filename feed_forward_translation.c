@@ -31,11 +31,11 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 	 * The first loop moves across the output neurons.
 	 */
     uint32_t ot;
-	for (ot = 0; ot < layer_spec->output_size; ot += hw.output_buffer_size)
+	for (ot = 0; ot < layer_spec->output_size; ot += hw.fc_output_buffer_size)
 	{
 		// Cover edge case of partially overlapping the buffer.
 		// It's possible we have less data than can fill the output buffer.
-		uint32_t o_buff_size = hw.output_buffer_size;
+		uint32_t o_buff_size = hw.fc_output_buffer_size;
 		uint32_t required_o_buff_space = layer_spec->output_size - ot;
 
 		hw.tile_height_reg = MIN(o_buff_size, required_o_buff_space);
@@ -51,16 +51,16 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 		 * The second loop moves across the inputs neurons.
 		 */
         uint32_t it;
-		for (it = 0; it < layer_spec->input_size; it += hw.input_buffer_size)
+		for (it = 0; it < layer_spec->input_size; it += hw.fc_input_buffer_size)
 		{
 			// Again, cover edge cases for tiling.
-			uint32_t i_buff_size = hw.input_buffer_size;
+			uint32_t i_buff_size = hw.fc_input_buffer_size;
 			uint32_t required_i_buff_space = layer_spec->input_size - it;
 
 			hw.tile_width_reg = MIN(i_buff_size, required_i_buff_space);
 
 			// Set the apply_activation_flag if we are at the last set of inputs for these particular outputs.
-			if (it + hw.input_buffer_size > layer_spec->input_size)
+			if (it + hw.fc_input_buffer_size > layer_spec->input_size)
 			{
 				hw.apply_activation_flag = HW_MODEL_APPLY_ACTIVATION;
 			}
@@ -111,24 +111,59 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 
 void feed_forward_conv(struct LayerConv * layer_spec)
 {
-	// TODO
+    // OFM -> Output feature map
+    uint32_t ofm_size_z = layer_spec->ofm_dims[2];
+    uint32_t ofm_size_y = layer_spec->ofm_dims[0];
+    uint32_t ofm_size_x = layer_spec->ofm_dims[1];
+
+    // First loop is over the output feature maps.
+    uint32_t ozt, oyt, oxt;
+
+    conv_indices indices = (conv_indices) {.oxt=0, .oyt=0, .ozt=0, .t_ofm_x=hw.conv_t_ofm_x, .t_ofm_y=hw.conv_t_ofm_y,
+            .t_ofm_z=hw.conv_t_ofm_z};
+
+    for (ozt = 0; ozt < ofm_size_z; ozt += hw.conv_t_ofm_z)
+    {
+        indices.ozt = ozt;
+        // Move the corresponding kernels into the weights buffer.
+        write_kernels_to_buffer(ozt, ozt + hw.conv_t_ofm_z, layer_spec);
+
+        // Tiling the input feature maps
+        for (oyt = 0; oyt < ofm_size_y; oyt++)
+        {
+            indices.oyt = oyt;
+            for (oxt = 0; oxt < ofm_size_x; oxt++)
+            {
+                indices.oxt = oxt;
+                // Move the input feature maps into the input buffer.
+                write_ifm_to_buffer(oxt, oyt, hw.conv_t_ofm_y, hw.conv_t_ofm_x, layer_spec);
+
+                // Move the bias to the output buffer.
+                write_conv_bias_to_buffer(layer_spec, &indices);
+
+                /*
+                 * TODO: Issue instruction, write the hardware emulator component, and read back from the output buffer.
+                 */
+            }
+        }
+    }
 }
 
 void set_hardware_model(uint32_t input_buffer_size, uint32_t weight_buffer_size, uint32_t output_buffer_size,
         uint32_t m_o, uint32_t m_i)
 {
-	hw.input_buffer_size = input_buffer_size;
-	hw.weight_buffer_size = weight_buffer_size;
-	hw.output_buffer_size = output_buffer_size;
+	hw.fc_input_buffer_size = input_buffer_size;
+	hw.fc_weight_buffer_size = weight_buffer_size;
+	hw.fc_output_buffer_size = output_buffer_size;
 	hw.m_o = m_o;
 	hw.m_i = m_i;
 }
 
 void initialize_hardware_model()
 {
-	hw.input_buffer = (float *) malloc(sizeof(float) * hw.input_buffer_size);
-	hw.output_buffer = (float *) malloc(sizeof(float) * hw.output_buffer_size);
-	hw.weight_buffer = (float *) malloc(sizeof(float) * hw.weight_buffer_size);
+	hw.input_buffer = (float *) malloc(sizeof(float) * hw.fc_input_buffer_size);
+	hw.output_buffer = (float *) malloc(sizeof(float) * hw.fc_output_buffer_size);
+	hw.weight_buffer = (float *) malloc(sizeof(float) * hw.fc_weight_buffer_size);
 }
 
 void teardown_hardware_model()
@@ -136,4 +171,70 @@ void teardown_hardware_model()
 	free(hw.input_buffer);
 	free(hw.output_buffer);
 	free(hw.weight_buffer);
+}
+
+void write_kernels_to_buffer(uint32_t start, uint32_t end, struct LayerConv *layer_spec) {
+    uint32_t i, j, k, l;
+    uint32_t kernel_rows = layer_spec->kernel_dims[0];
+    uint32_t kernel_cols = layer_spec->kernel_dims[1];
+    uint32_t number_of_input_feature_maps = layer_spec->ifm_dims[2];
+    for (i = 0; i < end - start; i++)
+    {
+        for (j = 0; j < kernel_rows; j++)
+        {
+            for (k = 0; k < kernel_cols; k++)
+            {
+                for (l = 0; l < number_of_input_feature_maps; l++)
+                {
+                    hw.weight_buffer[l + k * number_of_input_feature_maps + j * kernel_cols + i * kernel_rows]
+                            = layer_spec->kernel[l + k * number_of_input_feature_maps +
+                            j * kernel_cols + (i + start) * kernel_rows];
+                }
+            }
+        }
+    }
+}
+
+void write_ifm_to_buffer(uint32_t oxt, uint32_t oyt, uint32_t t_ofm_y, uint32_t t_ofm_x, struct LayerConv *layer_spec) {
+    uint32_t i, j, k;
+    uint32_t stride = layer_spec->stride;
+    uint32_t kernel_rows = layer_spec->kernel_dims[0];
+    uint32_t kernel_cols = layer_spec->kernel_dims[1];
+    uint32_t ifm_depth = layer_spec->ifm_dims[2];
+    uint32_t ifm_cols = layer_spec->ifm_dims[1];
+    float * inputs = layer_spec->ifm;
+
+    uint32_t i_upper_lim = stride * (t_ofm_y - 1) + kernel_rows;
+    uint32_t j_upper_lim = stride * (t_ofm_x - 1) + kernel_cols;
+
+    for (i = 0; i < i_upper_lim; i++)
+    {
+        for (j = 0; j < j_upper_lim; j++)
+        {
+            for (k = 0; k < ifm_depth; k++)
+            {
+                hw.input_buffer[k + j * ifm_depth + i * j_upper_lim] =
+                        inputs[k + (j + oxt) * ifm_depth + (i + oyt) * ifm_cols];
+            }
+        }
+    }
+}
+
+void write_conv_bias_to_buffer(struct LayerConv *layer_spec, struct conv_indices *indices) {
+    uint32_t i, j, k;
+
+    uint32_t bias_depth = layer_spec->ofm_dims[2];
+    uint32_t bias_cols = layer_spec->ofm_dims[0];
+
+    for (i = 0; i < indices->t_ofm_y; i++)
+    {
+        for (j = 0; j < indices->t_ofm_x; j++)
+        {
+            for (k = 0; k < indices->t_ofm_z; k++)
+            {
+                hw.output_buffer[k + j * indices->t_ofm_z + i * indices->t_ofm_x] =
+                        layer_spec->biases[(k + indices->ozt) + (j + indices->oxt) * bias_depth + (i + indices->oyt) * bias_cols];
+            }
+        }
+    }
 }

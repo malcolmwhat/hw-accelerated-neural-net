@@ -25,6 +25,16 @@
 #define FF_FC_LAYER 0x00
 #define FF_CONV_LAYER 0x01
 
+typedef struct conv_indices
+{
+    uint32_t ozt;
+    uint32_t oyt;
+    uint32_t oxt;
+    uint32_t t_ofm_z;
+    uint32_t t_ofm_y;
+    uint32_t t_ofm_x;
+} conv_indices;
+
 /**
  * This function is the interface with the outside world.
  *
@@ -43,6 +53,21 @@ void feed_forward_fc(struct LayerFC * layer_spec);
  * This function handles feed forward for convolutional layers.
  */
 void feed_forward_conv(struct LayerConv * layer_spec);
+
+/**
+ * Move range of kernels into weight buffer.
+ */
+void write_kernels_to_buffer(uint32_t start, uint32_t end, struct LayerConv * layer_spec);
+
+/**
+ * Move range of input feature maps into input buffer.
+ */
+void write_ifm_to_buffer(uint32_t oxt, uint32_t oyt, uint32_t t_ofm_y, uint32_t t_ofm_x, struct LayerConv * layer_spec);
+
+/**
+ * Move biases to the output buffer for conv layers.
+ */
+void write_conv_bias_to_buffer(struct LayerConv *layer_spec, struct conv_indices *indices);
 
 /**
  * Allow the hardware parameters to be set externally.

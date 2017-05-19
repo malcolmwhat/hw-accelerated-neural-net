@@ -13,15 +13,15 @@
  */
 typedef struct LayerConv
 {
-	uint32_t * ofm_dims; // Output feature map dimensions.
+	uint32_t * ofm_dims; // Output feature map dimensions. [ ROW, COLUMN, DEPTH ]
 	uint32_t * ifm_dims; // Input feature map dimensions.
 	uint32_t * kernel_dims; // Number of filters is inferred.
 	uint8_t * stride;
 
-	int32_t * ifm;
-	int32_t * ofm;
-	int32_t * kernel;
-	int32_t * biases;
+    float * ifm;
+	float * ofm;
+	float * kernel;
+	float * biases;
 } LayerConv;
 
 /*
