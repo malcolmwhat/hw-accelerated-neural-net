@@ -95,7 +95,7 @@ void feed_forward_fc(struct LayerFC * layer_spec)
 			/*
 			 * Now we have the input, output and weights buffer for the hardware accelerator completely filled.
 			 */
-			begin_hardware_acceleration();
+            fc_begin_hardware_acceleration();
 		}
 
 		/*
@@ -144,6 +144,7 @@ void feed_forward_conv(struct LayerConv * layer_spec)
                 /*
                  * TODO: Issue instruction, write the hardware emulator component, and read back from the output buffer.
                  */
+
             }
         }
     }

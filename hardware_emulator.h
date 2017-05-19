@@ -51,7 +51,7 @@ typedef struct hardware_model
 /*
  * Model for the control_signals of the compute unit.
  */
-typedef struct control_signal
+typedef struct fc_control_signal
 {
 	// Relative address of the input and output for this compute cycle.
 	uint32_t i_0;
@@ -60,20 +60,20 @@ typedef struct control_signal
 	uint32_t m_i;
 	uint32_t m_o;
 	uint8_t activation;
-} control_signal;
+} fc_control_signal;
 
 extern hardware_model hw;
-extern control_signal ctrl_sig;
+extern fc_control_signal fc_ctrl_sig;
 
 /**
  * This function emulates the behaviour of the on chip controller.
  */
-void begin_hardware_acceleration();
+void fc_begin_hardware_acceleration();
 
 /**
  * This function emulates the behaviour of the on chip compute unit.
  */
-void compute_step();
+void fc_compute_step();
 
 /**
  * Applies the current activation function.
