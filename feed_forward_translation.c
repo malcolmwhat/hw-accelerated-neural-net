@@ -141,10 +141,9 @@ void feed_forward_conv(struct LayerConv * layer_spec)
                 // Move the bias to the output buffer.
                 write_conv_bias_to_buffer(layer_spec, &indices);
 
-                /*
-                 * TODO: Issue instruction, write the hardware emulator component, and read back from the output buffer.
-                 */
+                conv_begin_hardware_acceleration();
 
+                // TODO: Read output buffer into main memory when done.
             }
         }
     }

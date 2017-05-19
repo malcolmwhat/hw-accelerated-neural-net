@@ -62,6 +62,14 @@ typedef struct fc_control_signal
 	uint8_t activation;
 } fc_control_signal;
 
+/*
+ * Model for the control signal for the conv compute unit.
+ */
+typedef struct conv_control_signal
+{
+	// Don't worry about this yet...
+} conv_control_signal;
+
 extern hardware_model hw;
 extern fc_control_signal fc_ctrl_sig;
 
@@ -69,6 +77,11 @@ extern fc_control_signal fc_ctrl_sig;
  * This function emulates the behaviour of the on chip controller.
  */
 void fc_begin_hardware_acceleration();
+
+/**
+ * This function emulates the on chip controller for conv layers.
+ */
+void conv_begin_hardware_acceleration();
 
 /**
  * This function emulates the behaviour of the on chip compute unit.

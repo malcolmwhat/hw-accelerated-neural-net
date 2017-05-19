@@ -73,3 +73,8 @@ void apply_activation(float * output_register)
 		*(output_register) = 0.0;
 	}
 }
+
+void conv_begin_hardware_acceleration() {
+	// TODO: Tiling at the hardware level.
+
+}
