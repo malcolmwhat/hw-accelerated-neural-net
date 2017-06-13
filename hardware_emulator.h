@@ -81,7 +81,7 @@ void fc_begin_hardware_acceleration();
 /**
  * This function emulates the on chip controller for conv layers.
  */
-void conv_begin_hardware_acceleration();
+void conv_begin_hardware_acceleration(uint32_t ky, uint32_t kx);
 
 /**
  * This function emulates the behaviour of the on chip compute unit.

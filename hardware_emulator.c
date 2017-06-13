@@ -74,7 +74,31 @@ void apply_activation(float * output_register)
 	}
 }
 
-void conv_begin_hardware_acceleration() {
+void conv_begin_hardware_acceleration(uint32_t kernel_size_y, uint32_t kernel_size_x) {
 	// TODO: Tiling at the hardware level.
+    /*
+     * Loop over the tiles in the buffer.
+     */
+    uint32_t oy, ox, ozb, ky, kx, kzb, oz, kz;
+    for (oy = 0; oy < hw.conv_t_ofm_y; oy++)
+    {
+        for (ox = 0; ox < hw.conv_t_ofm_x; ox++)
+        {
+            for (ozb = 0; ozb < hw.conv_t_ofm_z; ozb += hw.m_o)
+            {
+                // TODO: Cover edge cases.
 
+                for (ky = 0; ky < kernel_size_y; ky++)
+                {
+                    for (kx = 0; kx < kernel_size_x; kx++)
+                    {
+                        for (kzb = 0; kzb < ; kzb += hw.m_i)
+                        {
+
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
